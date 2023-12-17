@@ -1,0 +1,51 @@
+version: '3'
+
+services:
+  nginx-proxy:
+    image: jwilder/nginx-proxy:alpine
+    container_name: nginx-proxy
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - proxy
+      - outbound
+    environment:
+      - DHPARAM_SKIP=true
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - certs:/etc/nginx/certs
+      - html:/usr/share/nginx/html
+      - ${PWD}/configs:/etc/nginx/vhost.d
+
+  nginx-proxy-acme:
+    image: nginxproxy/acme-companion
+    container_name: nginx-proxy-acme
+    restart: always
+    depends_on:
+      - nginx-proxy
+    networks:
+      - proxy
+      - outbound
+    environment:
+      - DEFAULT_EMAIL=ssl@example.com
+      - NGINX_PROXY_CONTAINER=nginx-proxy
+      - NGINX_DOCKER_GEN_CONTAINER=nginx-proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - acme:/etc/acme.sh
+      - certs:/etc/nginx/certs
+      - html:/usr/share/nginx/html
+      - ${PWD}/configs:/etc/nginx/vhost.d
+
+volumes:
+  certs:
+  html:
+  acme:
+
+networks:
+  proxy:
+    external: true
+  outbound:
+    external: true
