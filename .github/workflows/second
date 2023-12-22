@@ -1,0 +1,14 @@
+on:
+  workflow_dispatch:
+  
+jobs:
+  check_files:
+    name: run push
+    runs-on: ubuntu-latest
+    environment: dev
+    
+    steps:
+    - name: check files
+      run: |
+        pwd
+        ls -la
