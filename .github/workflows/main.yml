@@ -8,6 +8,7 @@ jobs:
   run_pull:
     name: run push
     runs-on: ubuntu-latest
+    environment: dev
     
     steps:
     - name: install ssh keys
